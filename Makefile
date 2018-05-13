@@ -4,20 +4,22 @@ BUILD_TIME := $(shell date -u '+%Y-%m-%d_%I:%M:%S%p')
 
 .PHONY: lambda
 lambda:
-	GOOS=linux go build -o main github.com/verygoodsoftwarenotvirus/career-day/lambda
+	GOOS=linux go build -o main github.com/verygoodsoftwarenotvirus/career-day/cmd/lambda
 	zip deployment.zip main
 	rm main
 
 .PHONY: stress
 stress:
-	go run stress_test/main.go
+	go run cmd/stress_test/main.go
 
 .PHONY: more_stress
 more_stress:
-	go run stress_test/main.go 100ms
+	go run cmd/stress_test/main.go 100ms
 
+.PHONY: server
 server:
-	go build github.com/verygoodsoftwarenotvirus/career-day/server -o server
+	go build github.com/verygoodsoftwarenotvirus/career-day/cmd/server -o server
 
+.PHONY: run
 run: server
 	nohup sudo ./server > log.out &
