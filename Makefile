@@ -18,7 +18,7 @@ more_stress:
 
 .PHONY: server
 server:
-	go build github.com/verygoodsoftwarenotvirus/career-day/cmd/server -o server
+	go build -o server github.com/verygoodsoftwarenotvirus/career-day/cmd/server
 
 .PHONY: run
 run: server
