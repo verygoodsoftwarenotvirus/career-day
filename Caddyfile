@@ -1,0 +1,3 @@
+www.pizzagoblin.com {
+	proxy / http://localhost:8080
+}

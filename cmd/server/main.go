@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 
 	"github.com/kyokomi/emoji"
 )
@@ -52,6 +53,11 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	port := ":80"
+	if len(os.Args) > 1 {
+		port = os.Args[1]
+	}
+
 	go hub.run()
 
 	http.HandleFunc("/", serveHome)
@@ -60,7 +66,9 @@ func main() {
 		serveWs(hub, w, r)
 	})
 
-	err := http.ListenAndServe(":80", nil)
+	log.Printf("listning on port %s", port)
+
+	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
