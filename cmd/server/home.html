@@ -2,31 +2,6 @@
 <html lang="en">
 
 <head>
-    <title>Chat Example</title>
-    <script type="text/javascript">
-        window.onload = function () {
-            var conn;
-            var emojiDiv = document.getElementById('emoji');
-
-            function updateEmoji(newEmoji) {
-                emojiDiv.innerText = newEmoji;
-            }
-
-            if (window["WebSocket"]) {
-                conn = new WebSocket("ws://" + document.location.host + "/ws");
-                conn.onclose = function (evt) {
-                    updateEmoji('😢');
-                };
-                conn.onmessage = function (evt) {
-                    updateEmoji(evt.data);
-                };
-            } else {
-                var item = document.createElement("div");
-                item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
-                updateEmoji('😢');
-            }
-        };
-    </script>
     <style type="text/css">
         div {
             position: relative;
@@ -40,6 +15,45 @@
             transform: translate(-50%, -50%);
         }
     </style>
+    <script type="text/javascript">
+        const socketAddr = `ws://${document.location.host}/ws`
+        var emojiDiv = document.getElementById('emoji');
+        var conn = null;
+        var connectionHasFailed = false;
+
+        function initializeWebsocket() {
+            var wsc = new WebSocket(socketAddr);
+            wsc.onclose = function (evt) {
+                updateEmoji('😢');
+                connectionHasFailed = true;
+            };
+            wsc.onmessage = function (evt) {
+                updateEmoji(evt.data);
+            };
+            return wsc;
+        }
+
+        function updateEmoji(newEmoji) {
+            emojiDiv.innerText = newEmoji;
+        }
+
+        window.onload = () => {
+            if (window["WebSocket"]) {
+                conn = initializeWebsocket();
+            } else {
+                updateEmoji('😢');
+                connectionHasFailed = true;
+            }
+        };
+
+        window.setInterval(() => {
+            if (connectionHasFailed || !conn) {
+                console.log('lost connection to websocket, reinitializing');
+                connectionHasFailed = false;
+                conn = initializeWebsocket();
+            }
+        }, 500);
+    </script>
 </head>
 
 <body>
